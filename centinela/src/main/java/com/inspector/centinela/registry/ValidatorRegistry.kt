@@ -25,7 +25,16 @@ import com.inspector.centinela.model.rules.operative.RegexValidator
 import com.inspector.centinela.model.rules.operative.SizeValidator
 import kotlin.reflect.KClass
 
+/**
+ * A central registry that maps validation annotations to their corresponding [ConstraintValidator] implementations.
+ *
+ * This object manages the initialization and retrieval of validators for various constraints
+ * like [NotNull], [NotEmpty], [Positive], etc.
+ */
 object ValidatorRegistry {
+    /**
+     * Internal map storing the association between an annotation class and its validator instance.
+     */
     private val validators = mutableMapOf<KClass<out Annotation>, ConstraintValidator<Annotation, *>>()
 
     init {
@@ -42,6 +51,13 @@ object ValidatorRegistry {
         validators[Max::class] = MaxValidator()
     }
 
+    /**
+     * Retrieves the validator associated with a specific annotation class.
+     *
+     * @param A The type of the annotation.
+     * @param annotationClass The [KClass] of the annotation to find a validator for.
+     * @return The corresponding [ConstraintValidator], or null if no validator is registered for the given class.
+     */
     @Suppress("UNCHECKED_CAST")
     fun <A : Annotation> getValidator(annotationClass: KClass<A>): ConstraintValidator<A, Any>? {
         return validators[annotationClass] as? ConstraintValidator<A, Any>

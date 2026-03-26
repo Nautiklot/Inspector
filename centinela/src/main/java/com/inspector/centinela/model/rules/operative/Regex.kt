@@ -1,15 +1,23 @@
 package com.inspector.centinela.model.rules.operative
 
-import com.inspector.centinela.handler.ConstraintValidator
 import com.inspector.annotations.Regex
-import java.lang.reflect.Field
+import com.inspector.centinela.handler.ConstraintValidator
 
-
-// Validador para @Regex
+/**
+ * Validator for the [Regex] annotation.
+ *
+ * It validates that a string value matches the regular expression pattern
+ * specified in the annotation.
+ */
 class RegexValidator : ConstraintValidator<Regex, String> {
-    override fun isValid(annotation: Regex, value: String?): Boolean {
-        if (value == null) return false
-        val regex = kotlin.text.Regex(annotation.regex)
-        return regex.matches(value)
-    }
+
+    /**
+     * Checks if the provided string matches the regular expression pattern.
+     *
+     * @param annotation The [Regex] annotation instance containing the pattern.
+     * @param value The string to be validated.
+     * @return True if the value is not null and matches the pattern, false otherwise.
+     */
+    override fun isValid(annotation: Regex, value: String?): Boolean =
+        value != null && kotlin.text.Regex(annotation.regex).matches(value)
 }

@@ -39,23 +39,15 @@ android {
 afterEvaluate{
     publishing {
         publications {
-            // Creamos una publicación llamada "maven"
             create<MavenPublication>("maven") {
-                // El Group ID suele ser la ruta de tu repositorio en GitHub
-                // Ejemplo: com.github.tuUsuarioDeGithub
                 groupId = "com.github.nautiklot"
-
-                // El nombre específico de este módulo
                 artifactId = "centinela"
-
-                // La versión inicial de tu librería
                 version = "1.0.0"
             }
         }
     }
 }
 kapt {
-    // Le dice a kapt que haga el esfuerzo de mapear el error al archivo .kt
     mapDiagnosticLocations = true
 }
 
@@ -69,6 +61,6 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(project(":annotations"))
     kapt(project(":processor"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.22")
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotlin.test)
 }

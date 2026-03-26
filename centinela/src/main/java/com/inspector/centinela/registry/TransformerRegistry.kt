@@ -1,48 +1,38 @@
 package com.inspector.centinela.registry
 
 import com.inspector.annotations.Capitalize
-import com.inspector.annotations.Max
-import com.inspector.annotations.Min
-import com.inspector.annotations.Negative
-import com.inspector.annotations.NotBlank
-import com.inspector.annotations.NotEmpty
-import com.inspector.annotations.NotNull
-import com.inspector.annotations.NotZero
-import com.inspector.annotations.Positive
-import com.inspector.annotations.Regex
-import com.inspector.annotations.Size
 import com.inspector.annotations.Trim
-import com.inspector.centinela.handler.ConstraintValidator
 import com.inspector.centinela.handler.DataTransformer
 import com.inspector.centinela.model.rules.operative.CapitalizeTransformer
-import com.inspector.centinela.model.rules.operative.CapitalizeValidator
-import com.inspector.centinela.model.rules.operative.MaxValidator
-import com.inspector.centinela.model.rules.operative.MinValidator
-import com.inspector.centinela.model.rules.operative.NegativeValidator
-/*
-import com.inspector.centinela.model.rules.operative.NotBlankValidator
-import com.inspector.centinela.model.rules.operative.NotEmptyValidator
-import com.inspector.centinela.model.rules.operative.NotNullValidator
-import com.inspector.centinela.model.rules.operative.NotZeroValidator
-import com.inspector.centinela.model.rules.operative.PositiveValidator
-import com.inspector.centinela.model.rules.operative.RegexValidator
-import com.inspector.centinela.model.rules.operative.SizeValidator
-
- */
 import com.inspector.centinela.model.rules.operative.TrimTransformer
-
 import kotlin.reflect.KClass
 
+/**
+ * A central registry that maps transformation annotations to their corresponding [DataTransformer] implementations.
+ *
+ * This object manages the initialization and retrieval of transformers for modifications
+ * like [Trim], [Capitalize] etc.
+ */
 object TransformerRegistry {
-    private val validators = mutableMapOf<KClass<out Annotation>, DataTransformer<Annotation, *>>()
+    /**
+     * Internal map storing the association between an annotation class and its transformer instance.
+     */
+    private val transformers = mutableMapOf<KClass<out Annotation>, DataTransformer<Annotation, *>>()
 
     init {
-        validators[Trim::class] = TrimTransformer()
-        validators[Capitalize::class] = CapitalizeTransformer()
+        transformers[Trim::class] = TrimTransformer()
+        transformers[Capitalize::class] = CapitalizeTransformer()
     }
 
+    /**
+     * Retrieves the transformer associated with a specific annotation class.
+     *
+     * @param A The type of the annotation.
+     * @param annotationClass The [KClass] of the annotation to find a transformer for.
+     * @return The corresponding [DataTransformer], or null if no transformer is registered for the given class.
+     */
     @Suppress("UNCHECKED_CAST")
     fun <A : Annotation> getTransformer(annotationClass: KClass<A>): DataTransformer<A, Any>? {
-        return validators[annotationClass] as? DataTransformer<A, Any>
+        return transformers[annotationClass] as? DataTransformer<A, Any>
     }
 }

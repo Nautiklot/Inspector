@@ -15,13 +15,17 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
+/**
+ * Unit tests for the [Centinela] validation engine.
+ */
 class CentinelaTest {
 
-    val factory = CentinelaFactory(
+    private val factory = CentinelaFactory(
         transformerRegistry = true,
         validatorRegistry = true
     )
 
+    /** Model for testing text-based annotations like [Trim], [Capitalize], and [Regex]. */
     data class TextModel(
         @Trim
         @Capitalize
@@ -33,6 +37,7 @@ class CentinelaTest {
         var pinCode: String
     )
 
+    /** Model for testing numeric annotations like [Positive], [Negative], [Max], and [NotZero]. */
     data class NumberModel(
         @Positive
         @Max(max = 100)
@@ -45,6 +50,7 @@ class CentinelaTest {
         val multiplier: Float = 0.0f
     )
 
+    /** Complex model for testing various mixed constraints. */
     data class Motorcycle(
         @NotNull
         val owner: String?,
@@ -67,7 +73,7 @@ class CentinelaTest {
         val engineCc: Int
     )
 
-    // 1. Modelo para probar la agregación masiva
+    /** Model to test massive error aggregation. */
     data class Musician(
         @NotBlank
         @Size(min = 2, max = 20)
@@ -79,20 +85,20 @@ class CentinelaTest {
         val band: String
     )
 
-    // 2. Modelo para probar el orden de los Transformadores
+    /** Model to test the execution order of transformers vs validators. */
     data class UserInput(
         @Trim
         @Size(min = 5)
         var searchString: String
     )
 
-    // 3. Modelo sin anotaciones
+    /** Model without any annotations to test engine safety. */
     data class PlainObject(
         val id: Int,
         val description: String
     )
 
-    // 4. Modelo con propiedades privadas (¡El gran reto de la reflexión!)
+    /** Model with private properties to test reflection capabilities. */
     class EngineSpecs(
         @NotZero
         private val compressionRatio: Double,
@@ -100,7 +106,7 @@ class CentinelaTest {
         private val cylinders: Int
     )
 
-    // 5. Interfaz de prueba para el Handler
+    /** Test implementation of [ValidationResultHandler] to capture errors. */
     class TestValidationHandler : ValidationResultHandler {
         val capturedErrors = mutableListOf<Exception>()
         override fun onValidationFailed(errors: List<Exception>) {
@@ -109,51 +115,40 @@ class CentinelaTest {
     }
 
     @Test
-    fun `Trim y Capitalize deben limpiar y formatear el texto correctamente antes de validar`() {
-        // Texto con espacios al inicio/final y en minúsculas
+    fun `Trim and Capitalize should clean and format text correctly before validation`() {
         val model = TextModel(username = "   juanito   ", pinCode = "1234")
-
-        // Ejecutamos el motor (sin que lance error)
-
         Centinela(factory).engine(model, throws = true)
-
-        // Verificamos que el motor haya modificado las variables
         assertEquals("Juanito", model.username)
     }
 
     @Test
-    fun `Debe lanzar excepcion si el String esta en blanco o falla el Regex`() {
-        val model = TextModel(username = "   ", pinCode = "ABC") // pinCode debería ser solo números
-
+    fun `Should throw exception if string is blank or Regex fails`() {
+        val model = TextModel(username = "   ", pinCode = "ABC")
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(model, throws = true)
         }
-
         val errorMessages = exception.errors.map { it.message }
         assertTrue(errorMessages.any { it!!.contains("NotBlank") })
         assertTrue(errorMessages.any { it!!.contains("Regex") })
     }
 
     @Test
-    fun `Debe lanzar excepcion si no cumple el Size`() {
-        val modelShort = TextModel(username = "al", pinCode = "1234") // min = 3
+    fun `Should throw exception if Size constraint is not met`() {
+        val modelShort = TextModel(username = "al", pinCode = "1234")
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(modelShort, throws = true)
         }
         assertTrue(exception.errors.any { it.message!!.contains("Size") })
     }
 
-    // --- 4. PRUEBAS DE VALIDACIÓN NUMÉRICA ---
-
     @Test
-    fun `Numeros validos no deben lanzar excepciones`() {
+    fun `Valid numbers should not throw any exceptions`() {
         val validModel = NumberModel(score = 85, debt = -50.5, multiplier = 1.5f)
-        // Si lanza excepción, la prueba fallará automáticamente
         Centinela(factory).engine(validModel, throws = true)
     }
 
     @Test
-    fun `Debe fallar si Positive recibe cero o negativo`() {
+    fun `Should fail if Positive receives zero or negative value`() {
         val model = NumberModel(score = 0, debt = -10.0, multiplier = 1f)
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(model, throws = true)
@@ -162,7 +157,7 @@ class CentinelaTest {
     }
 
     @Test
-    fun `Debe fallar si Negative recibe cero o positivo`() {
+    fun `Should fail if Negative receives zero or positive value`() {
         val model = NumberModel(score = 10, debt = 0.0, multiplier = 1f)
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(model, throws = true)
@@ -171,7 +166,7 @@ class CentinelaTest {
     }
 
     @Test
-    fun `Debe fallar si NotZero recibe cero`() {
+    fun `Should fail if NotZero receives zero value`() {
         val model = NumberModel(score = 10, debt = -5.0, multiplier = 0.0f)
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(model, throws = true)
@@ -180,8 +175,8 @@ class CentinelaTest {
     }
 
     @Test
-    fun `Debe fallar si excede el Max`() {
-        val model = NumberModel(score = 150, debt = -5.0, multiplier = 1f) // max = 100
+    fun `Should fail if numeric value exceeds Max constraint`() {
+        val model = NumberModel(score = 150, debt = -5.0, multiplier = 1f)
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(model, throws = true)
         }
@@ -189,19 +184,15 @@ class CentinelaTest {
     }
 
     @Test
-    fun `NotEmpty debe permitir cadenas con solo espacios, a diferencia de NotBlank`() {
+    fun `NotEmpty should allow strings with only spaces unlike NotBlank`() {
         val bike = Motorcycle(owner = "Juan", licenseType = "   ", customName = "Susy", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 600)
-        // No debe lanzar excepción porque "   " no está vacío (tiene longitud 3)
-        val factory = CentinelaFactory(
-            validatorRegistry = true
-        )
-        Centinela(factory).engine(bike, throws = true)
+        val validatorOnlyFactory = CentinelaFactory(validatorRegistry = true)
+        Centinela(validatorOnlyFactory).engine(bike, throws = true)
     }
 
     @Test
-    fun `Trim seguido de NotEmpty debe fallar si el usuario solo envia espacios`() {
+    fun `Trim followed by NotEmpty should fail if user only sends spaces`() {
         val bike = Motorcycle(owner = "Juan", licenseType = "A", customName = "   ", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 600)
-
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(bike, throws = true)
         }
@@ -209,151 +200,125 @@ class CentinelaTest {
     }
 
     @Test
-    fun `Min y Max deben permitir los valores limite exactos`() {
-        val bikeLimitMin = Motorcycle(owner = "Juan", licenseType = "A", customName = "Susy", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 600) // Límite inferior
-        val bikeLimitMax = Motorcycle(owner = "Juan", licenseType = "A", customName = "Susy", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 1000) // Límite superior
+    fun `Min and Max should allow exact boundary values`() {
+        val bikeLimitMin = Motorcycle(owner = "Juan", licenseType = "A", customName = "Susy", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 600)
+        val bikeLimitMax = Motorcycle(owner = "Juan", licenseType = "A", customName = "Susy", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 1000)
 
         Centinela(factory).engine(bikeLimitMin, throws = true)
         Centinela(factory).engine(bikeLimitMax, throws = true)
     }
 
     @Test
-    fun `Debe fallar si el valor es menor al Min o mayor al Max`() {
+    fun `Should fail if value is below Min or above Max`() {
         val bikeUnder = Motorcycle(owner = "Juan", licenseType = "A", customName = "Susy", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 599)
         val bikeOver = Motorcycle(owner = "Juan", licenseType = "A", customName = "Susy", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 1001)
 
-        assertThrows<ValidationAggregatorException> {  Centinela(factory).engine(bikeUnder, throws = true) }
-        assertThrows<ValidationAggregatorException> {  Centinela(factory).engine(bikeOver, throws = true) }
+        assertThrows<ValidationAggregatorException> { Centinela(factory).engine(bikeUnder, throws = true) }
+        assertThrows<ValidationAggregatorException> { Centinela(factory).engine(bikeOver, throws = true) }
     }
-    
+
     @Test
-    fun `NotNull debe fallar si recibe un valor nulo explicito`() {
+    fun `NotNull should fail if it receives an explicit null value`() {
         val bike = Motorcycle(owner = null, licenseType = "A", customName = "Susy", modelCode = "GSX", plateNumber = "ABC-1234", engineCc = 600)
         val exception = assertThrows<ValidationAggregatorException> {
-             Centinela(factory).engine(bike, throws = true)
+            Centinela(factory).engine(bike, throws = true)
         }
         assertTrue(exception.errors.any { it.message!!.contains("NotNull") })
     }
 
     @Test
-    fun `Regex debe fallar si el formato no coincide exactamente`() {
-        // Placa inválida (falta el guion)
+    fun `Regex should fail if the format does not match exactly`() {
         val bike = Motorcycle(owner = "Juan", licenseType = "A", customName = "Susy", modelCode = "GSX", plateNumber = "ABC1234", engineCc = 600)
         val exception = assertThrows<ValidationAggregatorException> {
-             Centinela(factory).engine(bike, throws = true)
+            Centinela(factory).engine(bike, throws = true)
         }
         assertTrue(exception.errors.any { it.message!!.contains("Regex") })
     }
 
     @Test
-    fun `El motor no debe hacer nada si el objeto no tiene anotaciones`() {
-        val plain = PlainObject(1, "Sin reglas")
-        // assertDoesNotThrow asegura que el motor no crashea al leer un objeto limpio
+    fun `Engine should do nothing if the object has no annotations`() {
+        val plain = PlainObject(1, "No rules")
         assertDoesNotThrow {
             Centinela(factory).engine(plain, throws = true)
         }
     }
+
     @Test
-    fun `El ValidationResultHandler debe capturar errores sin lanzar Excepciones`() {
-        // Datos inválidos (edad negativa, banda vacía)
+    fun `ValidationResultHandler should capture errors without throwing exceptions`() {
         val tom = Musician(name = "Tom Araya", age = -5, band = "")
         val handler = TestValidationHandler()
 
-        // throws = false, pasamos el handler
         assertDoesNotThrow {
             Centinela(factory).engine(tom, throws = false, handler = handler)
         }
 
-        // Verificamos que el handler guardó los errores internamente
         assertEquals(2, handler.capturedErrors.size)
         assertTrue(handler.capturedErrors.any { it.message!!.contains("Positive") })
         assertTrue(handler.capturedErrors.any { it.message!!.contains("NotEmpty") })
     }
 
     @Test
-    fun `Debe agregar errores de multiples propiedades en una sola excepcion`() {
-        // Todo está mal en este objeto
+    fun `Should aggregate errors from multiple properties into a single exception`() {
         val badMusician = Musician(name = "", age = 150, band = "")
-
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(badMusician, throws = true)
         }
-
-        // Debería tener 4 errores: NotBlank, Size (por el nombre), Max (por la edad), NotEmpty (banda)
         assertEquals(4, exception.errors.size)
     }
 
     @Test
-    fun `Los transformadores (Trim) se ejecutan ANTES que los validadores (Size)`() {
-        // La longitud original es 7, pero con @Trim bajará a 3. 
-        // El @Size(min=5) debería fallar sobre el texto ya cortado.
+    fun `Transformers like Trim should execute BEFORE validators like Size`() {
         val input = UserInput(searchString = "  ABC  ")
-
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(input, throws = true)
         }
-
         assertTrue(exception.errors.any { it.message!!.contains("Size") })
-        assertEquals("ABC", input.searchString) // Confirmamos que sí lo mutó
+        assertEquals("ABC", input.searchString)
     }
 
     @Test
-    fun `Capitalize debe ignorar strings vacios o nulos sin crashear`() {
-        // Simulamos un validador manual para Capitalize solo para probar su lógica interna
+    fun `Capitalize should ignore empty or null strings without crashing`() {
         val transformer = CapitalizeTransformer()
         assertEquals("", transformer.transform(Capitalize(), ""))
         assertEquals(null, transformer.transform(Capitalize(), null))
     }
 
     @Test
-    fun `Capitalize debe manejar correctamente textos que ya estan en mayusculas`() {
+    fun `Capitalize should correctly handle strings that are already uppercase`() {
         val transformer = CapitalizeTransformer()
         assertEquals("SLAYER", transformer.transform(Capitalize(), "SLAYER"))
         assertEquals("Slayer", transformer.transform(Capitalize(), "slayer"))
     }
 
     @Test
-    fun `NotZero debe manejar la precision de Double y Float correctamente`() {
+    fun `NotZero should handle Double and Float precision correctly`() {
         val validator = NotZeroValidator()
-
-        // 0.0000001 no es cero, debe ser válido
         assertTrue(validator.isValid(NotZero(), 0.0000001))
-
-        // 0.0 estricto es inválido
         assertTrue(!validator.isValid(NotZero(), 0.0))
     }
 
     @Test
-    fun `Regex debe funcionar para validar estructuras complejas como correos`() {
-        // Reutilizamos el motor pero validamos la lógica pura del validador de Regex
+    fun `Regex should work for validating complex structures like emails`() {
         val validator = RegexValidator()
         val emailRegex = Regex(regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
-
-        assertTrue(validator.isValid(emailRegex, "usuario@correo.com"))
-        assertTrue(!validator.isValid(emailRegex, "usuario@.com")) // Inválido
+        assertTrue(validator.isValid(emailRegex, "user@mail.com"))
+        assertTrue(!validator.isValid(emailRegex, "user@.com"))
     }
 
     @Test
-    fun `Min y Max deben hacer casting automatico para soportar Ints aunque la regla sea Long`() {
+    fun `Min and Max should perform automatic casting to support Ints even if the rule is Long`() {
         val validator = MinValidator()
-        val minRule = Min(min = 600) // Regla de 600 (Long por defecto en tu anotación)
-
-        // Pasamos un Int (600cc). El validador debe convertirlo a Long internamente sin crashear.
+        val minRule = Min(min = 600)
         assertTrue(validator.isValid(minRule, 600))
         assertTrue(!validator.isValid(minRule, 599))
     }
 
     @Test
-    fun `El motor debe poder leer y validar propiedades PRIVADAS`() {
+    fun `Engine should be able to read and validate PRIVATE properties`() {
         val specs = EngineSpecs(compressionRatio = 0.0, cylinders = 4)
-
-        // El motor va a intentar leer "compressionRatio" que es private.
         val exception = assertThrows<ValidationAggregatorException> {
             Centinela(factory).engine(specs, throws = true)
         }
-
         assertTrue(exception.errors.any { it.message!!.contains("NotZero") })
     }
-
 }
-
