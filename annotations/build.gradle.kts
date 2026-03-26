@@ -15,7 +15,7 @@ publishing {
             artifactId = "annotations"
 
             // La versión inicial de tu librería
-            version = "1.0.0"
+            version = "1.0.1"
 
             // Le indicamos que empaquete el código compilado usando el componente de Java/Kotlin
             from(components["java"])

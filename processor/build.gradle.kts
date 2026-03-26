@@ -1,10 +1,30 @@
 plugins {
     kotlin("kapt")
     kotlin("jvm")
+    `maven-publish`
 }
 kapt {
     // Le dice a kapt que haga el esfuerzo de mapear el error al archivo .kt
     mapDiagnosticLocations = true
+}
+publishing {
+    publications {
+        // Creamos una publicación llamada "maven"
+        create<MavenPublication>("maven") {
+            // El Group ID suele ser la ruta de tu repositorio en GitHub
+            // Ejemplo: com.github.tuUsuarioDeGithub
+            groupId = "com.github.nautiklot"
+
+            // El nombre específico de este módulo
+            artifactId = "processor"
+
+            // La versión inicial de tu librería
+            version = "1.0.0"
+
+            // Le indicamos que empaquete el código compilado usando el componente de Java/Kotlin
+            from(components["java"])
+        }
+    }
 }
 
 

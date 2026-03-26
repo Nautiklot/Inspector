@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     kotlin("kapt")
+    `maven-publish`
 }
 
 android {
@@ -33,6 +34,24 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+    }
+}
+afterEvaluate{
+    publishing {
+        publications {
+            // Creamos una publicación llamada "maven"
+            create<MavenPublication>("maven") {
+                // El Group ID suele ser la ruta de tu repositorio en GitHub
+                // Ejemplo: com.github.tuUsuarioDeGithub
+                groupId = "com.github.nautiklot"
+
+                // El nombre específico de este módulo
+                artifactId = "centinela"
+
+                // La versión inicial de tu librería
+                version = "1.0.0"
+            }
+        }
     }
 }
 kapt {
