@@ -9,11 +9,24 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.type.MirroredTypesException
 import javax.tools.Diagnostic
 
+/**
+ * Annotation processor that validates if custom validation annotations are applied to compatible data types.
+ *
+ * It checks for the presence of the [AllowedType] meta-annotation on the applied annotations
+ * and verifies if the field type matches any of the allowed types.
+ */
 @AutoService(Processor::class)
-@SupportedSourceVersion(SourceVersion.RELEASE_17) // Usa la versión de Java de tu proyecto
-@SupportedAnnotationTypes("com.inspector.annotations.*") // La ruta exacta de tu anotación
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
+@SupportedAnnotationTypes("com.inspector.annotations.*")
 class ValidationProcessor : AbstractProcessor() {
 
+    /**
+     * Processes the set of annotations and validates the elements they are applied to.
+     *
+     * @param annotations The set of annotations to process.
+     * @param roundEnv The environment for information about the current and prior round.
+     * @return True if the annotations are claimed by this processor, false otherwise.
+     */
     override fun process(
         annotations: MutableSet<out TypeElement>,
         roundEnv: RoundEnvironment
@@ -24,10 +37,8 @@ class ValidationProcessor : AbstractProcessor() {
             val allowedTypeMeta = annotationElement.getAnnotation(AllowedType::class.java)
 
             if (allowedTypeMeta != null) {
-                // 1. Ahora obtenemos una LISTA de nombres permitidos
                 val expectedTypeNames = getExpectedTypeNames(allowedTypeMeta)
 
-                // 2. Verificamos si Any::class (java.lang.Object) está en la lista
                 val isAnyAllowed = expectedTypeNames.contains("java.lang.Object")
 
                 val elementsToValidate = roundEnv.getElementsAnnotatedWith(annotationElement)
@@ -37,18 +48,15 @@ class ValidationProcessor : AbstractProcessor() {
 
                         val actualType = element.asType().toString()
 
-                        // 3. Lógica de validación actualizada
-                        // Si "Any" no está permitido, Y el tipo actual no está en la lista de permitidos... ¡Error!
                         if (!isAnyAllowed && !expectedTypeNames.contains(actualType)) {
 
-                            // Unimos la lista para que el error se lea bonito (ej. "[int, double]")
                             val allowed = expectedTypeNames.joinToString(", ")
 
                             processingEnv.messager.printMessage(
                                 Diagnostic.Kind.ERROR,
-                                "\n Error: La anotación @${annotationElement.simpleName} " +
-                                        "solo acepta los tipos: $allowed. " +
-                                        "\n En el campo $element es de tipo '$actualType'. ",
+                                "\n Error: The annotation @${annotationElement.simpleName} " +
+                                        "only accepts the types: $allowed. " +
+                                        "\n In the field $element it is of type '$actualType'. ",
                                 element
                             )
                         }
@@ -59,13 +67,18 @@ class ValidationProcessor : AbstractProcessor() {
         return true
     }
 
-    // --- NUEVA FUNCIÓN SALVAVIDAS (Para arreglos) ---
+    /**
+     * Extracts the fully qualified names of the classes specified in the [AllowedType] annotation.
+     *
+     * Handles [MirroredTypesException] to safely access class information during the processing phase.
+     *
+     * @param annotation The [AllowedType] annotation instance.
+     * @return A list of strings representing the names of the allowed types.
+     */
     private fun getExpectedTypeNames(annotation: AllowedType): List<String> {
         try {
-            // Intento directo (rara vez funciona en tiempo de compilación)
             return annotation.types.map { it.java.name }
         } catch (e: MirroredTypesException) {
-            // Extracción segura a través de los TypeMirrors
             return e.typeMirrors.map { it.toString() }
         }
     }
