@@ -21,4 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Inspector"
 include(":app")
- 
+include(":annotations")
+include(":processor")
+include(":centinela")
