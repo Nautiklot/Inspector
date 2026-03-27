@@ -8,7 +8,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.nautiklot"
             artifactId = "annotations"
-            version = "1.0.1"
+            version = "1.0.0"
             from(components["java"])
         }
     }
