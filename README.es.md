@@ -31,7 +31,7 @@ Esta biblioteca está alojada en **JitPack**.
     repositories {
       google()
       mavenCentral()
-      maven { url = uri("[https://jitpack.io](https://jitpack.io)") }
+      maven { url  = uri("https://jitpack.io") }
     }
 }
 ```
@@ -127,7 +127,7 @@ El procesador Kapt verificará estrictamente que uses estas anotaciones en los t
 
 ## 🤝 Contribuciones
 ¡Las contribuciones son siempre bienvenidas! Para agregar una nueva regla de validación:
-1. Bifurca el repositorio.
+1. Descargar el repositorio.
 2. Crea una rama de características (`git checkout -b feature/NewRule`).
 3. Crea la anotación y asegúrate de usar `@AllowedType` para garantizar la seguridad en tiempo de compilación.
 4. Implementa el validador que hereda de `ConstraintValidator`.
