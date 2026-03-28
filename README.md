@@ -1,7 +1,7 @@
 # 🛡️ Centinela
 
 [![Release](https://jitpack.io/v/Nautiklot/Inspector.svg)](https://jitpack.io/#Nautiklot/Inspector)
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.22-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 *Read this in other languages: [Español](README.es.md)*
@@ -12,7 +12,8 @@ Unlike heavy traditional frameworks, Centinela combines strict **compile-time sa
 
 ## ✨ Features
 
-* **Fail-Fast (Compile-Time Safety):** The annotation processor prevents you from using rules on incompatible types (e.g., using `@NotBlank` on an `Int` will break the build).
+* **Blazing Fast Compilation:** Built natively on KSP, meaning it understands Kotlin types directly without generating slow Java stubs (up to 2x faster than KAPT).
+* **Fail-Fast Safety:** The KSP processor prevents you from using rules on incompatible types (e.g., using `@NotBlank` on an `Int` will break the build instantly).
 * **Data Transformers:** It doesn't just validate; it cleans your data (e.g., `@Trim`, `@Capitalize`) before evaluation.
 * **100% Kotlin-First:** Designed to leverage Kotlin's type system without heavy Java EE dependencies.
 * **Clean Error Handling:** Aggregates all validation errors into a single exception or returns them through a clean, optional interface.
@@ -40,19 +41,28 @@ dependencyResolutionManagement {
 
 ```kotlin
   plugins {
-      kotlin("kapt")
+    kotlin("android")
+    alias(libs.plugins.google.devtools.ksp)
   }
   
   dependencies {
-      val validKtVersion = "1.0.0" // Check the latest version on the badge above
+      val centinelaVersion = "1.1.0" // Check the latest version on the badge above
   
       // Core annotations and runtime engine
-      implementation("com.github.Nautiklot.Inspector:annotations:$validKtVersion")
-      implementation("com.github.Nautiklot.Inspector:centinela:$validKtVersion")
+      implementation("com.github.Nautiklot.Inspector:annotations:$centinelaVersion")
+      implementation("com.github.Nautiklot.Inspector:centinela:$centinelaVersion")
       
       // Compile-time processor for type safety
-      kapt("com.github.com.github.Nautiklot.Inspector:processor:$validKtVersion")
+      kapt("com.github.com.github.Nautiklot.Inspector:processor:$centinelaVersion")
   }
+```
+If use (gradle/libs.versions.toml)
+```kotlin
+[plugins]
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "symbolProcessingApi" }
+
+[versions]
+symbolProcessingApi = "2.2.0-2.0.2"  // Adjust to your Kotlin version
 ```
 
 ## 🚀 Quick Start
@@ -73,6 +83,9 @@ data class Motorcycle(
     @Positive 
     @Min(600) 
     val engineCc: Int, // If 599 is provided, it throws an error
+
+    @Positive
+    val age: Int, // If -5 is provided, it throws an error
     
     @Regex("^[A-Z0-9-]{5,8}$") 
     val licensePlate: String
@@ -87,16 +100,26 @@ fun main() {
         brand = "suzuki", 
         model = "GSX-R", 
         engineCc = 600, 
+        age = -5,
         licensePlate = "bad-plate!"
     )
 
     try {
-        Centinela.engine(myBike, throws = true)
+        Centinela().engine(myBike, throws = true)
         println("Motorcycle registered: ${myBike.brand}") 
     } catch (e: ValidationAggregatorException) {
         println("Validation failed:")
         e.errors.forEach { println("- ${it.message}") }
     }
+    
+    //or
+    Centinela().engine(myBike, throws = false, object : ValidationResultHandler {
+        override fun onValidationFailed(errors: List<Exception>){
+            println("Validation failed:")
+            errors.forEach { println("- ${it.message}") }
+        }
+    })
+    
 }
 ```
 

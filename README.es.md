@@ -1,7 +1,7 @@
 # 🛡️ Centinela
 
 [![Release](https://jitpack.io/v/Nautiklot/Inspector.svg)](https://jitpack.io/#Nautiklot/Inspector)
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.22-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 *Read this in other languages: [English](README.md)*
@@ -12,7 +12,8 @@ A diferencia de los pesados ​​frameworks tradicionales, Centinela combina un
 
 ## ✨ Características
 
-* **Fallo rápido (Seguridad en tiempo de compilación):** El procesador de anotaciones impide el uso de reglas en tipos incompatibles (por ejemplo, usar `@NotBlank` en un `Int` provocará un error de compilación).
+* **Compilación ultrarrápida:** Desarrollado de forma nativa en KSP, lo que significa que entiende los tipos de Kotlin directamente sin generar stubs de Java lentos (hasta 2 veces más rápido que KAPT).
+* **Seguridad ante fallos inmediatos:** El procesador KSP impide el uso de reglas en tipos incompatibles (por ejemplo, usar `@NotBlank` en un `Int` provocará un fallo en la compilación al instante).
 * **Transformadores de datos:** No solo valida, sino que limpia los datos (por ejemplo, `@Trim`, `@Capitalize`) antes de la evaluación.
 * **100% Kotlin-First:** Diseñado para aprovechar el sistema de tipos de Kotlin sin dependencias pesadas de Java EE.
 * **Gestión de errores limpia:** Agrupa todos los errores de validación en una única excepción o los devuelve a través de una interfaz limpia y opcional.
@@ -39,21 +40,29 @@ Esta biblioteca está alojada en **JitPack**.
 **2. Agrega las dependencias** en el módulo de tu aplicación:
 
 ```kotlin
-
-plugins {
-  kotlin("kapt")
-}
+  plugins {
+    kotlin("android")
+    alias(libs.plugins.google.devtools.ksp)
+  }
 
 dependencies {
-  val validKtVersion = "1.0.0" // Consulta la última versión en la insignia de arriba
+  val centinelaVersion = "1.0.0" // Consulta la última versión en la insignia de arriba
 
   // Anotaciones principales y motor de ejecución
-  implementation("com.github.Nautiklot.Inspector:annotations:$validKtVersion")
-  implementation("com.github.Nautiklot.Inspector:centinela:$validKtVersion")
+  implementation("com.github.Nautiklot.Inspector:annotations:$centinelaVersion")
+  implementation("com.github.Nautiklot.Inspector:centinela:$centinelaVersion")
 
   // Procesador en tiempo de compilación para seguridad de tipos
-  kapt("com.github.com.github.Nautiklot.Inspector:processor:$validKtVersion")
+  kapt("com.github.com.github.Nautiklot.Inspector:processor:$centinelaVersion")
 }
+```
+Si usas (gradle/libs.versions.toml)
+```kotlin
+[plugins]
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "symbolProcessingApi" }
+
+[versions]
+symbolProcessingApi = "2.2.0-2.0.2"  // Ajusta a la version de kotlin que uses
 ```
 
 ## 🚀 Inicio rápido
@@ -74,6 +83,9 @@ data class Motorcycle(
     @Positive
     @Min(600)
     val engineCc: Int, // Si se proporciona 599, se produce un error
+
+    @Positive
+    val age: Int, // Si se proporciona -5 se produce un error
     
     @Regex("^[A-Z0-9-]{5,8}$")
     val licensePlate: String
@@ -87,17 +99,26 @@ fun main() {
     val myBike = Motorcycle(
         brand = "suzuki", 
         model = "GSX-R", 
-        engineCc = 600, 
+        engineCc = 600,
+        age = -5,
         licensePlate = "bad-plate!"
     )
 
     try {
-        Centinela.engine(myBike, throws = true)
+        Centinela().engine(myBike, throws = true)
         println("Motorcycle registered: ${myBike.brand}") 
     } catch (e: ValidationAggregatorException) {
         println("Validation failed:")
         e.errors.forEach { println("- ${it.message}") }
     }
+
+    //or
+    Centinela().engine(myBike, throws = false, object : ValidationResultHandler {
+        override fun onValidationFailed(errors: List<Exception>){
+            println("Validation failed:")
+            errors.forEach { println("- ${it.message}") }
+        }
+    })
 }
 ```
 
