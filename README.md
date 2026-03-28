@@ -46,11 +46,12 @@ dependencyResolutionManagement {
   }
   
   dependencies {
-      val centinelaVersion = "1.1.0" // Check the latest version on the badge above
+      val centinelaVersion = "1.0.0" // Check the latest version on the badge above
+      val processorVersion = "1.1.0"
   
       // Core annotations and runtime engine
       implementation("com.github.Nautiklot.Inspector:annotations:$centinelaVersion")
-      implementation("com.github.Nautiklot.Inspector:centinela:$centinelaVersion")
+      implementation("com.github.Nautiklot.Inspector:centinela:$processorVersion")
       
       // Compile-time processor for type safety
       kapt("com.github.com.github.Nautiklot.Inspector:processor:$centinelaVersion")
