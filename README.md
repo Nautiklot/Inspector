@@ -54,7 +54,7 @@ dependencyResolutionManagement {
       implementation("com.github.Nautiklot.Inspector:centinela:$centinelaVersion")
       
       // Compile-time processor for type safety
-      kapt("com.github.com.github.Nautiklot.Inspector:processor:$processorVersion")
+      ksp("com.github.com.github.Nautiklot.Inspector:processor:$processorVersion")
   }
 ```
 If use (gradle/libs.versions.toml)
