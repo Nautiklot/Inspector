@@ -1,9 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt")
-    kotlin("kapt")
     `maven-publish`
+    alias(libs.plugins.google.devtools.ksp)
 }
 
 android {
@@ -37,18 +36,16 @@ android {
     }
 }
 afterEvaluate{
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
+    publishing{
+        publications{
+            create<MavenPublication>("release"){
+                from(components.getByName("release"))
                 groupId = "com.github.nautiklot"
                 artifactId = "centinela"
-                version = "1.2.0"
+                version = "1.2.1"
             }
         }
     }
-}
-kapt {
-    mapDiagnosticLocations = true
 }
 
 dependencies {
@@ -60,7 +57,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(kotlin("reflect"))
     implementation(project(":annotations"))
-    kapt(project(":processor"))
+    ksp(project(":processor"))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlin.test)
 }
