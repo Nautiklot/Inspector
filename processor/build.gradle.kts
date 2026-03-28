@@ -1,10 +1,6 @@
 plugins {
-    kotlin("kapt")
     kotlin("jvm")
     `maven-publish`
-}
-kapt {
-    mapDiagnosticLocations = true
 }
 publishing {
     publications {
@@ -23,5 +19,4 @@ dependencies {
     implementation(project(":annotations"))
     implementation(libs.symbol.processing.api)
     compileOnly(libs.auto.service.annotations)
-    kapt(libs.auto.service)
 }
