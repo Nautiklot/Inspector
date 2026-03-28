@@ -51,10 +51,10 @@ dependencyResolutionManagement {
   
       // Core annotations and runtime engine
       implementation("com.github.Nautiklot.Inspector:annotations:$centinelaVersion")
-      implementation("com.github.Nautiklot.Inspector:centinela:$processorVersion")
+      implementation("com.github.Nautiklot.Inspector:centinela:$centinelaVersion")
       
       // Compile-time processor for type safety
-      kapt("com.github.com.github.Nautiklot.Inspector:processor:$centinelaVersion")
+      kapt("com.github.com.github.Nautiklot.Inspector:processor:$processorVersion")
   }
 ```
 If use (gradle/libs.versions.toml)
