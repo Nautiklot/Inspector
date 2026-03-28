@@ -27,7 +27,7 @@ Esta biblioteca está alojada en **JitPack**.
 **1. Agrega el repositorio de JitPack** a tu archivo `settings.gradle.kts` o al archivo `build.gradle.kts` de tu proyecto:
 
 ```kotlin
-    dependencyResolutionManagement {
+dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
       google()
