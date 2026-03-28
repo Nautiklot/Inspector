@@ -27,7 +27,7 @@ Esta biblioteca está alojada en **JitPack**.
 **1. Agrega el repositorio de JitPack** a tu archivo `settings.gradle.kts` o al archivo `build.gradle.kts` de tu proyecto:
 
 ```kotlin
-    dependencyResolutionManagement {
+dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
       google()
@@ -46,15 +46,14 @@ Esta biblioteca está alojada en **JitPack**.
   }
 
 dependencies {
-  val centinelaVersion = "1.0.0" // Consulta la última versión en la insignia de arriba
-  val processorVersion = "1.1.0"
-
-  // Anotaciones principales y motor de ejecución
-  implementation("com.github.Nautiklot.Inspector:annotations:$centinelaVersion")
-  implementation("com.github.Nautiklot.Inspector:centinela:$centinelaVersion")
-
-  // Procesador en tiempo de compilación para seguridad de tipos
-  ksp("com.github.com.github.Nautiklot.Inspector:processor:$processorVersion")
+      val version = "1.2.0" // Consulta la última versión en la insignia de arriba
+    
+      // Anotaciones principales y motor de ejecución
+      implementation("com.github.Nautiklot.Inspector:annotations:$version")
+      implementation("com.github.Nautiklot.Inspector:centinela:$version")
+      
+      // Procesador en tiempo de compilación para seguridad de tipos
+      ksp("com.github.Nautiklot.Inspector:processor:$version")
 }
 ```
 Si usas (gradle/libs.versions.toml)

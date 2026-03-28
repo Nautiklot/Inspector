@@ -46,15 +46,14 @@ dependencyResolutionManagement {
   }
   
   dependencies {
-      val centinelaVersion = "1.0.0" // Check the latest version on the badge above
-      val processorVersion = "1.1.0"
-  
-      // Core annotations and runtime engine
-      implementation("com.github.Nautiklot.Inspector:annotations:$centinelaVersion")
-      implementation("com.github.Nautiklot.Inspector:centinela:$centinelaVersion")
+      val version = "1.2.0" // Check the latest version on the badge above
+
+      // Core annotations and runtime centinela
+      implementation("com.github.Nautiklot.Inspector:annotations:$version")
+      implementation("com.github.Nautiklot.Inspector:centinela:$version")
       
       // Compile-time processor for type safety
-      ksp("com.github.com.github.Nautiklot.Inspector:processor:$processorVersion")
+      ksp("com.github.Nautiklot.Inspector:processor:$version")
   }
 ```
 If use (gradle/libs.versions.toml)
