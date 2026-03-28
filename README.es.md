@@ -54,7 +54,7 @@ dependencies {
   implementation("com.github.Nautiklot.Inspector:centinela:$centinelaVersion")
 
   // Procesador en tiempo de compilación para seguridad de tipos
-  kapt("com.github.com.github.Nautiklot.Inspector:processor:$processorVersion")
+  ksp("com.github.com.github.Nautiklot.Inspector:processor:$processorVersion")
 }
 ```
 Si usas (gradle/libs.versions.toml)
