@@ -46,7 +46,7 @@ dependencyResolutionManagement {
   }
   
   dependencies {
-      val version = "1.2.0" // Check the latest version on the badge above
+      val version = "1.2.1" // Check the latest version on the badge above
 
       // Core annotations and runtime centinela
       implementation("com.github.Nautiklot.Inspector:annotations:$version")
