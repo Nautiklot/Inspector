@@ -46,7 +46,7 @@ dependencyResolutionManagement {
   }
 
 dependencies {
-      val version = "1.2.0" // Consulta la última versión en la insignia de arriba
+      val version = "1.2.1" // Consulta la última versión en la insignia de arriba
     
       // Anotaciones principales y motor de ejecución
       implementation("com.github.Nautiklot.Inspector:annotations:$version")
