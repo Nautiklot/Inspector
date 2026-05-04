@@ -14,12 +14,13 @@ class ProcessorProvider : SymbolProcessorProvider {
     /**
      * Creates a new instance of [Processor].
      *
-     * @param environment The environment providing KSP services like logger and options.
+     * @param environment The environment providing KSP services like logger and code generator.
      * @return A new [SymbolProcessor] instance.
      */
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         return Processor(
-            logger = environment.logger
+            logger = environment.logger,
+            codeGenerator = environment.codeGenerator
         )
     }
 }

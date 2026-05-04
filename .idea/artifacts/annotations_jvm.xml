@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="annotations-jvm">
+    <output-path>$PROJECT_DIR$/annotations/build/libs</output-path>
+    <root id="archive" name="annotations-jvm.jar">
+      <element id="module-output" name="Inspector.annotations.jvmMain" />
+    </root>
+  </artifact>
+</component>

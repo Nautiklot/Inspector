@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="centinela-js">
+    <output-path>$PROJECT_DIR$/centinela/build/libs</output-path>
+    <root id="archive" name="centinela-js.jar">
+      <element id="module-output" name="Inspector.centinela.jsMain" />
+    </root>
+  </artifact>
+</component>

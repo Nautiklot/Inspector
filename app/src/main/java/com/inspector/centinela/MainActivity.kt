@@ -11,6 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.inspector.annotations.Capitalize
+import com.inspector.annotations.Max
+import com.inspector.annotations.Min
+import com.inspector.annotations.NotBlank
+import com.inspector.annotations.Positive
+import com.inspector.annotations.Size
+import com.inspector.annotations.Trim
 import com.inspector.centinela.ui.theme.InspectorTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,6 +34,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        val model = Moto(marca = "dsdsd", cilindrada = 1, misss= 1001)
+        val errores = model.validate()
+        model.validateOrThrow()
+
+        errores.forEach { println(it) }
+
+
     }
 }
 
@@ -45,3 +59,19 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+data class Moto(
+    @NotBlank
+    @Trim
+    @Capitalize
+    var marca: String,
+
+    @Positive
+    var cilindrada: Int,
+
+    @Max(5000)
+    @Min(1000)
+    @Size(1,16)
+    val misss: Int
+    
+)
