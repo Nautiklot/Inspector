@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
 }
 group = "com.github.Nautiklot.Inspector"
-version = "2.0.0"
+version = "2.0.1"
 publishing {
     publications {
         create<MavenPublication>("maven") {

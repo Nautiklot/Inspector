@@ -56,7 +56,10 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation(project(":annotations"))
-    implementation(project(":centinela"))
-    ksp(project(":processor"))
+    //implementation(project(":annotations"))
+    //implementation(project(":centinela"))
+    //ksp(project(":processor"))
+    //implementation("com.github.Nautiklot.Inspector:annotations:2.0.0")
+    //implementation("com.github.Nautiklot.Inspector:centinela:2.0.0")
+    //ksp("com.github.Nautiklot.Inspector:processor:2.0.0")
 }
