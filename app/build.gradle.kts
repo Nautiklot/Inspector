@@ -7,9 +7,7 @@ plugins {
 
 android {
     namespace = "com.inspector.centinela"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.inspector.centinela"

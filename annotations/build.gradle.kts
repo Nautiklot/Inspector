@@ -1,24 +1,28 @@
 plugins {
-    id("java-library")
-    alias(libs.plugins.jetbrains.kotlin.jvm)
+    alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
 }
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = "com.github.nautiklot"
-            artifactId = "annotations"
-            version = "1.2.1"
-            from(components["java"])
-        }
-    }
-}
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
+group = "com.github.nautiklot.Inspector"
+version = "2.0.0"
 kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+    // 1. Soporte para Android y Backend (Ktor/Spring)
+    jvm()
+
+    // 2. Soporte para ecosistema Apple (iPhone físico y simuladores)
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    // 3. Soporte para Web (JavaScript)
+    js(IR) {
+        browser()
+        nodejs()
+    }
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+            }
+        }
     }
 }
