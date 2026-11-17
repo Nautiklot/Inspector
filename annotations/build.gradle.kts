@@ -6,10 +6,10 @@ plugins {
 
 // 1. CORRECCIÓN: "N" mayúscula y versión 2.0.3
 group = "com.github.Nautiklot.Inspector"
-version = "2.0.3"
+version = "2.0.4"
 
 kotlin {
-    // Soporte para Android y Backend (Ktor/Spring)
+    jvmToolchain(17)
     jvm()
     androidTarget {
         publishLibraryVariants("release")
@@ -42,5 +42,10 @@ android {
 
     defaultConfig {
         minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
