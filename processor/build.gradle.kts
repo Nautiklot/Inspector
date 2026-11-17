@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     `maven-publish`
 }
-group = "com.github.Nautiklot.Inspector"
-version = "2.0.1"
+group = "com.github.nautiklot.Inspector"
+version = "2.0.2"
 publishing {
     publications {
         create<MavenPublication>("maven") {
