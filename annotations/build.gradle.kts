@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
 }
 group = "com.github.nautiklot.Inspector"
-version = "2.0.1"
+version = "2.0.2"
 kotlin {
     // 1. Soporte para Android y Backend (Ktor/Spring)
     jvm()
