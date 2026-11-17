@@ -1,19 +1,26 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    id("com.android.library")
     `maven-publish`
 }
-group = "com.github.nautiklot.Inspector"
-version = "2.0.2"
-kotlin {
-    // 1. Soporte para Android y Backend (Ktor/Spring)
-    jvm()
 
-    // 2. Soporte para ecosistema Apple (iPhone físico y simuladores)
+// 1. CORRECCIÓN: "N" mayúscula y versión 2.0.3
+group = "com.github.Nautiklot.Inspector"
+version = "2.0.3"
+
+kotlin {
+    // Soporte para Android y Backend (Ktor/Spring)
+    jvm()
+    androidTarget {
+        publishLibraryVariants("release")
+    }
+
+    // Soporte para ecosistema Apple (iPhone físico y simuladores)
     iosX64()
     iosArm64()
     iosSimulatorArm64()
 
-    // 3. Soporte para Web (JavaScript)
+    // Soporte para Web (JavaScript)
     js(IR) {
         browser()
         nodejs()
@@ -22,7 +29,18 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                // Aquí irían dependencias comunes si las tuvieras
             }
         }
+    }
+}
+
+// 2. CORRECCIÓN: Bloque obligatorio de Android
+android {
+    namespace = "com.twinkslab.annotations"
+    compileSdk = 34
+
+    defaultConfig {
+        minSdk = 24
     }
 }

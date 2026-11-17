@@ -1,19 +1,20 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    // ❌ ELIMINADO: id("com.android.library")
     `maven-publish`
 }
-group = "com.github.nautiklot.Inspector"
-version = "2.0.2"
+
+// ✅ CORRECCIÓN: "N" mayúscula y versión 2.0.3
+group = "com.github.Nautiklot.Inspector"
+version = "2.0.3"
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            // Ya no necesitas declarar groupId, artifactId ni version aquí.
-            // Gradle los tomará de las variables globales de arriba automáticamente.
             from(components["java"])
         }
     }
 }
-
 
 dependencies {
     testImplementation(libs.junit)
